@@ -13,23 +13,19 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long user1Id;
+    @ManyToOne
+    private User user1;
 
-    @Column(nullable = false)
-    private Long user2Id;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @ManyToOne
+    private User user2;
 
     public ChatRoom() {
     }
 
-    public ChatRoom(Long id, Long user1Id, Long user2Id, LocalDateTime createdAt) {
+    public ChatRoom(Long id, User user1, User user2) {
         this.id = id;
-        this.user1Id = user1Id;
-        this.user2Id = user2Id;
-        this.createdAt = createdAt;
+        this.user1 = user1;
+        this.user2 = user2;
     }
 
     public Long getId() {
@@ -40,38 +36,28 @@ public class ChatRoom {
         this.id = id;
     }
 
-    public Long getUser1Id() {
-        return user1Id;
+    public User getUser1() {
+        return user1;
     }
 
-    public void setUser1Id(Long user1Id) {
-        this.user1Id = user1Id;
+    public void setUser1(User user1) {
+        this.user1 = user1;
     }
 
-    public Long getUser2Id() {
-        return user2Id;
+    public User getUser2() {
+        return user2;
     }
 
-    public void setUser2Id(Long user2Id) {
-        this.user2Id = user2Id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setUser2(User user2) {
+        this.user2 = user2;
     }
 
     @Override
     public String toString() {
         return "ChatRoom{" +
                 "id=" + id +
-                ", user1Id=" + user1Id +
-                ", user2Id=" + user2Id +
-                ", createdAt=" + createdAt +
+                ", user1=" + user1 +
+                ", user2=" + user2 +
                 '}';
     }
-
 }
