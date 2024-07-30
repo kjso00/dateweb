@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8088
 spring:
   jpa:
     show-sql: true
@@ -7,7 +7,7 @@ spring:
       hibernate:
         format_sql: true
         hbm2ddl:
-          auto: update
+          auto: create
     database: mysql
   datasource:
     url: jdbc:mysql://localhost:3306/gangnam

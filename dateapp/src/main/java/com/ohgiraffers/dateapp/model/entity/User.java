@@ -1,4 +1,4 @@
-package com.ohgiraffers.dateapp.model;
+package com.ohgiraffers.dateapp.model.entity;
 
 
 import jakarta.persistence.*;
@@ -11,10 +11,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
     private String password;
 
     public User() {

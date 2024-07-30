@@ -42,18 +42,18 @@ public class ChatService {
         return chatRoomRepository.save(newRoom);
     }
 
-    public void saveMessage(Long chatRoomId, String senderUsername, String content) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RuntimeException("Chat room not found"));
-        User sender = userRepository.findByUsername(senderUsername);
+    public void saveMessage(Long roomId, User sender, String content, Long recipientId) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setRoomId(roomId);
+        chatMessage.setSender(sender);
+        chatMessage.setContent(content);
+        chatMessage.setRecipientId(recipientId);
+        // 현재 시간을 LocalDateTime으로 설정
+        LocalDateTime now = LocalDateTime.now();
+        chatMessage.setTimestamp(now); // LocalDateTime 타입으로 설정
 
-        ChatMessage message = new ChatMessage();
-        message.setChatRoom(chatRoom);
-        message.setSender(sender);
-        message.setContent(content);
-        message.setTimestamp(LocalDateTime.now());
-
-        chatMessageRepository.save(message);
+        // 메시지를 데이터베이스에 저장
+        chatMessageRepository.save(chatMessage);
     }
 
     public List<ChatMessage> getChatMessages(Long chatRoomId) {
@@ -67,5 +67,10 @@ public class ChatService {
                 .orElseThrow(() -> new RuntimeException("Chat room not found"));
         chatMessageRepository.deleteByChatRoom(chatRoom);
         chatRoomRepository.delete(chatRoom);
+    }
+
+    public ChatRoom getChatRoomById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RuntimeException("Chat room not found"));
     }
 }

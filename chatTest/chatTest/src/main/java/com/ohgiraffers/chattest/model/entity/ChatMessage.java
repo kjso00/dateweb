@@ -21,16 +21,22 @@ public class ChatMessage {
 
     private String content;
 
+    private Long roomId;
+
+    private Long recipientId; // 수신자 ID 추가
+
     private LocalDateTime timestamp;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(Long id, ChatRoom chatRoom, User sender, String content, LocalDateTime timestamp) {
+    public ChatMessage(Long id, ChatRoom chatRoom, User sender, String content, Long roomId, Long recipientId, LocalDateTime timestamp) {
         this.id = id;
         this.chatRoom = chatRoom;
         this.sender = sender;
         this.content = content;
+        this.roomId = roomId;
+        this.recipientId = recipientId;
         this.timestamp = timestamp;
     }
 
@@ -66,6 +72,22 @@ public class ChatMessage {
         this.content = content;
     }
 
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public Long getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(Long recipientId) {
+        this.recipientId = recipientId;
+    }
+
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
@@ -76,11 +98,13 @@ public class ChatMessage {
 
     @Override
     public String toString() {
-        return "Message{" +
+        return "ChatMessage{" +
                 "id=" + id +
                 ", chatRoom=" + chatRoom +
                 ", sender=" + sender +
                 ", content='" + content + '\'' +
+                ", roomId=" + roomId +
+                ", recipientId=" + recipientId +
                 ", timestamp=" + timestamp +
                 '}';
     }

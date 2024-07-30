@@ -19,15 +19,25 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginPage() {
-        return "login";
+        return "/login";
     }
+
+//    @PostMapping("/login")
+//    public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
+//        User user = userService.loginUser(username, password);
+//        if (user != null) {
+//            session.setAttribute("user", user);
+//            return "redirect:/chat/" + username;
+//        }
+//        return "redirect:/login?error";
+//    }
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
         User user = userService.loginUser(username, password);
         if (user != null) {
             session.setAttribute("user", user);
-            return "redirect:/chat/" + username;
+            return "redirect:/users"; // 사용자 목록 페이지로 리다이렉트
         }
         return "redirect:/login?error";
     }
