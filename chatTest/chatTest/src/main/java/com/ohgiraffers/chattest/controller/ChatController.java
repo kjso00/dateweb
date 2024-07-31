@@ -106,7 +106,7 @@ public class ChatController {
     @MessageMapping("/chat/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId, ChatMessage message) {
         // 메시지 처리 로직 (예: 데이터베이스에 저장)
-        chatService.saveMessage(roomId, message.getSender(), message.getContent(), message.getRecipientId());
+        chatService.saveMessage(roomId, message.getSenderId(), message.getContent(), message.getRecipientId());
         // 상대방에게 메시지 전송
         messagingTemplate.convertAndSendToUser(    // convertAndSendToUser: 특정 사용자에게 메시지를 전송하는 메서드
                 message.getRecipientId().toString(),  // 메시지를 받을 사용자의 ID를 문자열로 변환하여 지정

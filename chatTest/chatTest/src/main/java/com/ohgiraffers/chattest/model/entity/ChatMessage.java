@@ -16,8 +16,9 @@ public class ChatMessage {
     @ManyToOne
     private ChatRoom chatRoom;
 
+    // 여러 메시지가 하나의 채팅방에 속할 수 있음
     @ManyToOne
-    private User sender;
+    private User senderId;
 
     private String content;
 
@@ -30,10 +31,10 @@ public class ChatMessage {
     public ChatMessage() {
     }
 
-    public ChatMessage(Long id, ChatRoom chatRoom, User sender, String content, Long roomId, Long recipientId, LocalDateTime timestamp) {
+    public ChatMessage(Long id, ChatRoom chatRoom, User senderId, String content, Long roomId, Long recipientId, LocalDateTime timestamp) {
         this.id = id;
         this.chatRoom = chatRoom;
-        this.sender = sender;
+        this.senderId = senderId;
         this.content = content;
         this.roomId = roomId;
         this.recipientId = recipientId;
@@ -56,12 +57,12 @@ public class ChatMessage {
         this.chatRoom = chatRoom;
     }
 
-    public User getSender() {
-        return sender;
+    public User getSenderId() {
+        return senderId;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
+    public void setSenderId(User senderId) {
+        this.senderId = senderId;
     }
 
     public String getContent() {
@@ -101,7 +102,7 @@ public class ChatMessage {
         return "ChatMessage{" +
                 "id=" + id +
                 ", chatRoom=" + chatRoom +
-                ", sender=" + sender +
+                ", senderId=" + senderId +
                 ", content='" + content + '\'' +
                 ", roomId=" + roomId +
                 ", recipientId=" + recipientId +

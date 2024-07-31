@@ -42,10 +42,10 @@ public class ChatService {
         return chatRoomRepository.save(newRoom);
     }
 
-    public void saveMessage(Long roomId, User sender, String content, Long recipientId) {
+    public void saveMessage(Long roomId, User senderId, String content, Long recipientId) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setRoomId(roomId);
-        chatMessage.setSender(sender);
+        chatMessage.setSenderId(senderId);
         chatMessage.setContent(content);
         chatMessage.setRecipientId(recipientId);
         // 현재 시간을 LocalDateTime으로 설정
