@@ -27,24 +27,43 @@ public class ChatService {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
-    public ChatRoom createChatRoom(String username1, String username2) {
-        User user1 = userRepository.findByUsername(username1);
-        User user2 = userRepository.findByUsername(username2);
+    // 사용자와 상대방 채팅방 생성
+//    public ChatRoom createChatRoom(String username1, String username2) {
+//        User user1 = userRepository.findByUsername(username1);
+//        User user2 = userRepository.findByUsername(username2);
+//
+//        ChatRoom existingRoom = chatRoomRepository.findByUser1AndUser2(user1, user2);
+//        if (existingRoom != null) {
+//            return existingRoom;
+//        }
+//
+//        ChatRoom newRoom = new ChatRoom();
+//        newRoom.setUser1(user1);
+//        newRoom.setUser2(user2);
+//        return chatRoomRepository.save(newRoom);
+//    }
 
-        ChatRoom existingRoom = chatRoomRepository.findByUser1AndUser2(user1, user2);
-        if (existingRoom != null) {
-            return existingRoom;
-        }
+    // 수정코드
+    public ChatRoom findChatRoomByUsers(Long userId1, Long userId2) {
+        // 두 사용자 간의 채팅방을 찾는 로직
+        return chatRoomRepository.findByUser1IdAndUser2IdOrUser1IdAndUser2Id(userId1, userId2, userId2, userId1);
+    }
 
+    public ChatRoom createChatRoom(Long userId1, Long userId2) {
+        // 새 채팅방 생성 로직
         ChatRoom newRoom = new ChatRoom();
-        newRoom.setUser1(user1);
-        newRoom.setUser2(user2);
+        newRoom.setUser1(userRepository.findById(userId1).orElseThrow());
+        newRoom.setUser2(userRepository.findById(userId2).orElseThrow());
         return chatRoomRepository.save(newRoom);
     }
 
+
+
+
+    // ------------------------------------
     public void saveMessage(Long roomId, User senderId, String content, Long recipientId) {
         ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setRoomId(roomId);
+//        chatMessage.setRoomId(roomId);
         chatMessage.setSenderId(senderId);
         chatMessage.setContent(content);
         chatMessage.setRecipientId(recipientId);
@@ -62,6 +81,7 @@ public class ChatService {
         return chatMessageRepository.findByChatRoomOrderByTimestampAsc(chatRoom);
     }
 
+    // 채팅방 나가기
     public void deleteChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RuntimeException("Chat room not found"));

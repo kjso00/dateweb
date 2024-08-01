@@ -2,6 +2,7 @@ package com.ohgiraffers.chattest.model.entity;
 
 
 import jakarta.persistence.*;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -14,10 +15,12 @@ public class ChatMessage {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
     // 여러 메시지가 하나의 채팅방에 속할 수 있음
     @ManyToOne
+
     private User senderId;
 
     private String content;

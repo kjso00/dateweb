@@ -7,7 +7,10 @@
 <h2>Choose a user to chat with:</h2>
 <ul>
     <li th:each="user : ${users}">
-        <a th:href="@{/chat/request(to=${user.username})}" th:text="${user.username}"></a>
+
+<!--        수정코드-->
+        <a th:href="@{/chat/start/{userId}(userId=${user.id})}" th:text="${user.username}"></a>
+<!--        <a th:href="@{/chat/request(to=${user.username})}" th:text="${user.username}"></a>-->
     </li>
 </ul>
 <a href="/logout">Logout</a>
