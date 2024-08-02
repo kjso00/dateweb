@@ -57,23 +57,38 @@ public class ChatService {
         return chatRoomRepository.save(newRoom);
     }
 
-
+    // ------수정코드 8/2 15:33
+    public ChatRoom findChatRoomById(Long roomId) {
+        return chatRoomRepository.findById(roomId).orElse(null); // Optional을 사용하여 채팅방 조회
+    }
 
 
     // ------------------------------------
-    public void saveMessage(Long roomId, User senderId, String content, Long recipientId) {
-        ChatMessage chatMessage = new ChatMessage();
+//    public void saveMessage(Long roomId, Long senderId, String content, Long recipientId) {
+//        // ChatRoom 객체 가져오기
+//        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+//                .orElseThrow(() -> new IllegalArgumentException("Chat room not found")); // 채팅방이 존재하지 않을 경우 예외 처리
+//
+//        ChatMessage chatMessage = new ChatMessage();
 //        chatMessage.setRoomId(roomId);
-        chatMessage.setSenderId(senderId);
-        chatMessage.setContent(content);
-        chatMessage.setRecipientId(recipientId);
+//        chatMessage.setSenderId(senderId);
+//        chatMessage.setContent(content);
+//        chatMessage.setRecipientId(recipientId);
+//        // 현재 시간을 LocalDateTime으로 설정
+//        LocalDateTime now = LocalDateTime.now();
+//        chatMessage.setTimestamp(now); // LocalDateTime 타입으로 설정
+//        // 메시지를 데이터베이스에 저장
+//        chatMessageRepository.save(chatMessage);
+//    }
+
+    public void saveMessage(ChatMessage chatMessage) {
         // 현재 시간을 LocalDateTime으로 설정
         LocalDateTime now = LocalDateTime.now();
         chatMessage.setTimestamp(now); // LocalDateTime 타입으로 설정
-
         // 메시지를 데이터베이스에 저장
         chatMessageRepository.save(chatMessage);
     }
+
 
     public List<ChatMessage> getChatMessages(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
@@ -93,4 +108,6 @@ public class ChatService {
         return chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RuntimeException("Chat room not found"));
     }
+
+
 }

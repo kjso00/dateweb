@@ -18,29 +18,30 @@ public class ChatMessage {
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
-    // 여러 메시지가 하나의 채팅방에 속할 수 있음
     @ManyToOne
-
-    private User senderId;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender; // User 객체 추가
 
     private String content;
 
     private Long roomId;
 
-    private Long recipientId; // 수신자 ID 추가
+    @ManyToOne
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private User recipient; // User 객체 추가
 
     private LocalDateTime timestamp;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(Long id, ChatRoom chatRoom, User senderId, String content, Long roomId, Long recipientId, LocalDateTime timestamp) {
+    public ChatMessage(Long id, ChatRoom chatRoom, User sender, String content, Long roomId, User recipient, LocalDateTime timestamp) {
         this.id = id;
         this.chatRoom = chatRoom;
-        this.senderId = senderId;
+        this.sender = sender;
         this.content = content;
         this.roomId = roomId;
-        this.recipientId = recipientId;
+        this.recipient = recipient;
         this.timestamp = timestamp;
     }
 
@@ -60,12 +61,12 @@ public class ChatMessage {
         this.chatRoom = chatRoom;
     }
 
-    public User getSenderId() {
-        return senderId;
+    public User getSender() {
+        return sender;
     }
 
-    public void setSenderId(User senderId) {
-        this.senderId = senderId;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
     public String getContent() {
@@ -84,12 +85,12 @@ public class ChatMessage {
         this.roomId = roomId;
     }
 
-    public Long getRecipientId() {
-        return recipientId;
+    public User getRecipient() {
+        return recipient;
     }
 
-    public void setRecipientId(Long recipientId) {
-        this.recipientId = recipientId;
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
     }
 
     public LocalDateTime getTimestamp() {
@@ -105,10 +106,10 @@ public class ChatMessage {
         return "ChatMessage{" +
                 "id=" + id +
                 ", chatRoom=" + chatRoom +
-                ", senderId=" + senderId +
+                ", sender=" + sender +
                 ", content='" + content + '\'' +
                 ", roomId=" + roomId +
-                ", recipientId=" + recipientId +
+                ", recipient=" + recipient +
                 ", timestamp=" + timestamp +
                 '}';
     }

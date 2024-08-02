@@ -6,6 +6,7 @@ import com.ohgiraffers.chattest.model.entity.ChatRoom;
 import com.ohgiraffers.chattest.model.entity.User;
 import com.ohgiraffers.chattest.repository.UserRepository;
 import com.ohgiraffers.chattest.service.ChatService;
+import com.ohgiraffers.chattest.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -33,6 +34,9 @@ public class ChatController {
 
     @Autowired
     private ChatService chatService;
+
+    @Autowired
+    private UserService userService;
 
 
    @Autowired
@@ -89,15 +93,37 @@ public class ChatController {
 
     // 메시지 전송
     @MessageMapping("/chat/{roomId}")
+    // @DestinationVariable Long roomId: 사용자가 보낸 메시지가 어떤 채팅방과 관련이 있는지를 식별
+    // ChatMessage message에는 채팅메시지 내용, 발신자ID, 수신자ID 등을 포함하고있어야됨
     public void sendMessage(@DestinationVariable Long roomId, ChatMessage message) {
-        if (message.getSenderId() == null || message.getRecipientId() == null) {
+        // 유효성 검사
+        if (message.getSender() == null || message.getRecipient() == null) {
             throw new IllegalArgumentException("Sender ID or Recipient ID cannot be null");
         }
+        // ChatRoom 객체 가져오기 (예시: roomId로부터 ChatRoom 객체를 조회)
+        ChatRoom chatRoom = chatService.findChatRoomById(roomId);
+        if (chatRoom == null) {
+            throw new IllegalArgumentException("Chat room not found");
+        }
+
+        // 예시: 현재 로그인한 사용자 정보를 가져오는 방법
+        User user = userService.findById(message.getSender()); // 발신자 정보
+        User recipientUser = userService.findById(message.getRecipient()); // 수신자 정보
+
+        // ChatMessage 객체 생성 시 sender 및 recipient 설정
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setSender(user); // user는 발신자 User 객체
+        chatMessage.setRecipient(recipientUser); // recipientUser는 수신자 User 객체
+        chatMessage.setChatRoom(chatRoom);
+        chatMessage.setContent(message.getContent());
+
+        // 메시지 저장
+        chatService.saveMessage(chatMessage);
         // 메시지 처리 로직 (예: 데이터베이스에 저장)
-        chatService.saveMessage(roomId, message.getSenderId(), message.getContent(), message.getRecipientId());
+//        chatService.saveMessage(roomId, message.getSenderId(), message.getContent(), message.getRecipientId());
         // 상대방에게 메시지 전송
         messagingTemplate.convertAndSendToUser(    // convertAndSendToUser: 특정 사용자에게 메시지를 전송하는 메서드
-                message.getRecipientId().toString(),  // 메시지를 받을 사용자의 ID를 문자열로 변환하여 지정
+                message.getRecipient().toString(),  // 메시지를 받을 사용자의 ID를 문자열로 변환하여 지정
                 "/queue/messages",    // 사용자가 수신할 메시지의 대기열
                 message    // 실제로 전송할 메시지 객체
         );

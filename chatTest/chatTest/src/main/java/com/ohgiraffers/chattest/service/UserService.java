@@ -29,4 +29,10 @@ public class UserService {
         }
         return null;
     }
+
+    // findById 메소드 추가
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
 }
