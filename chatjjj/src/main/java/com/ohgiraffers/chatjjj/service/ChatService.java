@@ -22,12 +22,13 @@ public class ChatService {
 
     @Transactional
     public void saveMessage(Message message) {
+
         messageRepository.save(message);
     }
 
     @Transactional
-    public List<Message> getChatMessages(User sender, User recipient) {
-        return messageRepository.findBySenderAndRecipient(sender, recipient);
+    public List<Message> getChatMessages(User user1, User user2) {
+        return messageRepository.findBySenderAndRecipientOrRecipientAndSenderOrderByIdAsc(user1, user2, user2, user1);
     }
 
 

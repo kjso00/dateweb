@@ -3,6 +3,7 @@ package com.ohgiraffers.chatjjj.model.entity;
 
 import jakarta.persistence.*;
 
+
 import java.util.Set;
 
 @Entity
@@ -13,10 +14,14 @@ public class User {
     private Long id;
 
     private String username;
+
+
     private String password;
+
 
     @OneToMany(mappedBy = "sender")
     private Set<Message> sentMessages;
+
 
     @OneToMany(mappedBy = "recipient")
     private Set<Message> receivedMessages;

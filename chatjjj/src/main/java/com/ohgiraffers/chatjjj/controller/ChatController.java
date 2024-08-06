@@ -1,6 +1,7 @@
 package com.ohgiraffers.chatjjj.controller;
 
 import com.ohgiraffers.chatjjj.model.dto.MessageDTO;
+import com.ohgiraffers.chatjjj.model.dto.MessageResponseDTO;
 import com.ohgiraffers.chatjjj.model.entity.Message;
 import com.ohgiraffers.chatjjj.model.entity.User;
 import com.ohgiraffers.chatjjj.service.ChatService;
@@ -16,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ChatController {
@@ -51,38 +54,51 @@ public class ChatController {
     @GetMapping("/chat/{recipientUsername}")
     public String chatWithUser(@PathVariable String recipientUsername, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("user");
-        User recipient = userService.findUserByUsername(recipientUsername);
-
-        // 사용자가 로그인하지 않았더라도 recipient 정보가 존재하는지 확인
-        if (recipient == null) {
-            return "redirect:/login"; // 상대방 사용자 정보가 없으면 로그인 페이지로 리다이렉트
+        if (currentUser == null) {
+            return "redirect:/login";
         }
 
-        // 모델에 사용자 정보 추가
+        Optional<User> recipientOptional = userService.findByUsername(recipientUsername);
+        if (recipientOptional.isEmpty()) {
+            model.addAttribute("error", "User not found");
+            return "chat";
+        }
+
+        User recipient = recipientOptional.get();
         model.addAttribute("otherUser", recipient);
         model.addAttribute("messages", chatService.getChatMessages(currentUser, recipient));
-        model.addAttribute("currentUser", currentUser); // 현재 사용자 정보를 추가하여 메시지를 보낼 때 사용
+        model.addAttribute("currentUser", currentUser);
 
-        return "chatroom"; // 채팅방 페이지로 이동
+        return "chatroom";
     }
 
     @MessageMapping("/send/message")
-    public void sendMessageWithDTO(@Payload MessageDTO messageDTO) {
-        User senderUser = userService.findById(messageDTO.getSenderId());
-        User recipientUser = userService.findById(messageDTO.getRecipientId());
-        if (recipientUser != null) {
+    public void sendMessageWithDTO(@Payload MessageDTO messageDTO, Principal principal) {
+        try {
+            Optional<User> senderOptional = userService.findByUsername(principal.getName());
+            Optional<User> recipientOptional = userService.findById(messageDTO.getRecipientId());
+
+            if (senderOptional.isEmpty() || recipientOptional.isEmpty()) {
+                throw new RuntimeException("Sender or Recipient not found");
+            }
+
+            User senderUser = senderOptional.get();
+            User recipientUser = recipientOptional.get();
+
             Message message = new Message();
             message.setSender(senderUser);
             message.setRecipient(recipientUser);
             message.setContent(messageDTO.getContent());
 
-            // 메시지를 데이터베이스에 저장
             chatService.saveMessage(message);
 
-            // 메시지를 전송
+            MessageResponseDTO responseDTO = new MessageResponseDTO(message);
             messagingTemplate.convertAndSendToUser(
-                    recipientUser.getUsername(), "/queue/messages", message);
+                    recipientUser.getUsername(), "/queue/messages", responseDTO);
+        } catch (Exception e) {
+            // 에러 로깅 및 클라이언트에 에러 메시지 전송
+            messagingTemplate.convertAndSendToUser(
+                    principal.getName(), "/queue/errors", "Message sending failed: " + e.getMessage());
         }
     }
-
 }

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Controller
 public class AuthController {
 
@@ -41,10 +43,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-        User user = userService.findUserByUsername(username);
-        if (user != null && user.getPassword().equals(password)) {
-            session.setAttribute("user", user);
-            return "redirect:/chat";
+        Optional<User> userOptional = userService.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getPassword().equals(password)) {  // 주의: 실제 애플리케이션에서는 비밀번호를 이렇게 비교하면 안됩니다.
+                session.setAttribute("user", user);
+                return "redirect:/chat";
+            }
         }
         return "redirect:/login?error";
     }

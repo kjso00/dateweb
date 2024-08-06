@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,18 +23,13 @@ public class UserService {
 
 
     @Transactional
-    public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Transactional
     public void saveUser(User user) {
         userRepository.save(user);
     }
 
     @Transactional
     public boolean usernameExists(String username) {
-        return userRepository.findByUsername(username) != null;
+        return userRepository.findByUsername(username).isPresent();
     }
 
     @Transactional
@@ -42,8 +38,13 @@ public class UserService {
     }
 
     @Transactional
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null); // 사용자 ID로 사용자 찾기
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Transactional
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 
