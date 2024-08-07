@@ -2,7 +2,14 @@ package com.ohgiraffers.chattest.config;
 
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -33,5 +40,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 클라이언트는 "/ws" 주소로 웹소켓 연결을 시작
         registry.addEndpoint("/ws").withSockJS();  // registry는 엔드포인트를 설정할 수 있는 객체
         // 클라이언트는 JS의 WebSocketAPI를 사용하여 /ws 경로로 연결을 시도
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                if (StompCommand.SEND.equals(accessor.getCommand())) {
+                    // 여기서 메시지 유효성 검사를 수행할 수 있습니다.
+                }
+                return message;
+            }
+        });
     }
 }

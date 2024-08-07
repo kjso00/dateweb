@@ -20,96 +20,52 @@ public class ChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
-    private User sender; // User 객체 추가
-
-    private String content;
-
-    private Long roomId;
+    private User sender;
 
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
-    private User recipient; // User 객체 추가
+    private User recipient;
+
+    private String content;
 
     private LocalDateTime timestamp;
 
-    public ChatMessage() {
-    }
+    // 기본 생성자
+    public ChatMessage() {}
 
-    public ChatMessage(Long id, ChatRoom chatRoom, User sender, String content, Long roomId, User recipient, LocalDateTime timestamp) {
-        this.id = id;
+    // 모든 필드를 포함한 생성자
+    public ChatMessage(ChatRoom chatRoom, User sender, User recipient, String content) {
         this.chatRoom = chatRoom;
         this.sender = sender;
-        this.content = content;
-        this.roomId = roomId;
         this.recipient = recipient;
-        this.timestamp = timestamp;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public ChatRoom getChatRoom() {
-        return chatRoom;
-    }
-
-    public void setChatRoom(ChatRoom chatRoom) {
-        this.chatRoom = chatRoom;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
         this.content = content;
+        this.timestamp = LocalDateTime.now();
     }
 
-    public Long getRoomId() {
-        return roomId;
-    }
+    // Getter 메소드
+    public Long getId() { return id; }
+    public ChatRoom getChatRoom() { return chatRoom; }
+    public User getSender() { return sender; }
+    public User getRecipient() { return recipient; }
+    public String getContent() { return content; }
+    public LocalDateTime getTimestamp() { return timestamp; }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
-    }
-
-    public User getRecipient() {
-        return recipient;
-    }
-
-    public void setRecipient(User recipient) {
-        this.recipient = recipient;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+    // Setter 메소드
+    public void setId(Long id) { this.id = id; }
+    public void setChatRoom(ChatRoom chatRoom) { this.chatRoom = chatRoom; }
+    public void setSender(User sender) { this.sender = sender; }
+    public void setRecipient(User recipient) { this.recipient = recipient; }
+    public void setContent(String content) { this.content = content; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
     @Override
     public String toString() {
         return "ChatMessage{" +
                 "id=" + id +
-                ", chatRoom=" + chatRoom +
-                ", sender=" + sender +
+                ", chatRoom=" + chatRoom.getId() +
+                ", sender=" + sender.getId() +
+                ", recipient=" + recipient.getId() +
                 ", content='" + content + '\'' +
-                ", roomId=" + roomId +
-                ", recipient=" + recipient +
                 ", timestamp=" + timestamp +
                 '}';
     }

@@ -101,8 +101,10 @@
 
 <script th:inline="javascript">
     let chatRoomId = [[${chatRoomId}]];
-    let currentUser = [[${session.user.username}]];
-    let otherUserId = [[${session.user.username}]];
+    let currentUserId = [[${session.user.id}]];
+    let currentUsername = [[${session.user.username}]];
+    let otherUserId = [[${otherUser.id}]];
+    let otherUsername = [[${otherUser.username}]];
     let stompClient = null;
 
     // stompClient: 웹소켓 연결을 위한 STOMP 클라이언트 객체를 저장할 변수
@@ -136,8 +138,8 @@
         let content = $('#message-input').val();
         if(content && content.trim() !== '') {
             const message = {
-                senderId: currentUser,
-                recipientId: otherUserId,
+                sender: {id: currentUserId},
+                recipient: {id: otherUserId},
                 content: content
                 // recipientId: recipientId // 수신자 ID를 추가
             };
@@ -147,18 +149,19 @@
             );
             $('#message-input').val('');
             // 보낸 메시지 화면에 표시
-            showMessage(message);  // showMessage 호출
+            showMessage({senderId: currentUserId, content: content});  // showMessage 호출
         }
     }
 
     // 메시지 표시
     function showMessage(message) {
         let messageElement = $('<div class="message"></div>');
-        let senderElement = $('<div class="message-sender"></div>').text(message.senderId + ':');
+        let senderElement = $('<div class="message-sender"></div>').text(
+            (message.senderId === currentUserId ? currentUsername : otherUsername) + ':'
+        );
         let contentElement = $('<div class="message-content"></div>').text(message.content);
-        $('#chat-messages').append('<div>' + message.senderId + ': ' + message.content + '</div>');
 
-        if (message.senderId === currentUser) {
+        if (message.senderId === currentUserId) {
             messageElement.addClass('sent');
         } else {
             messageElement.addClass('received');

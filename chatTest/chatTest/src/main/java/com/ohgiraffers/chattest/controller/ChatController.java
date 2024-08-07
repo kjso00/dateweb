@@ -1,6 +1,7 @@
 package com.ohgiraffers.chattest.controller;
 
 
+import com.ohgiraffers.chattest.model.dto.ChatMessageDTO;
 import com.ohgiraffers.chattest.model.entity.ChatMessage;
 import com.ohgiraffers.chattest.model.entity.ChatRoom;
 import com.ohgiraffers.chattest.model.entity.User;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ChatController {
@@ -55,77 +58,57 @@ public class ChatController {
 
     }
 
-    // 채팅요청 페이지 렌더링
-    // 세선에 저장된 사용자 정보와 url경로의 사용자 이름을 비교
-//    @GetMapping("/chat/{username}")
-//    public String chatPage(@PathVariable String username, Model model, HttpSession session) {  // HttpSession: 현재 사용자 세션을 나타냄
-//        // 세션에서 "user"라는 키로 저장된 사용자 객체를 가져옴
-//        User user = (User) session.getAttribute("user");
-//        if (user == null || !user.getUsername().equals(username)) {
-//            return "redirect:/login";
-//        }
-//        model.addAttribute("username", username);
-//        return "chat";
-//    }
-
 
     // startChat 메소드에서 리다이렉트된 후 호출
     // 채팅방 정보, 메시지 목록, 상대방 정보 등을 모델에 추가해서 채팅 페이지 렌더링
     @GetMapping("/chat/room/{roomId}")
     public String chatRoom(@PathVariable Long roomId, Model model, HttpSession session) {
-        // 현재 로그인한 사용자 정보를 세션에서 가져옴
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
-        // 채팅방id 조회하고 chatRoom 변수에 저장
         ChatRoom chatRoom = chatService.getChatRoomById(roomId);
-        // chatRoom.getUser1().equals(currentUser): 채팅방의 user1이 현재 사용자인지 확인
-        // 만약 user1이 현재 사용자라면, chatRoom.getUser2()를 반환하여 상대방을 user2로 설정
-        // 이렇게 결정된 상대방 사용자 객체를 otherUser에 저장
         User otherUser = chatRoom.getUser1().equals(currentUser) ? chatRoom.getUser2() : chatRoom.getUser1();
-        // 모델에 채팅방Id, 채팅 메시지 목록, 상대방 사용자의 이름을 추가
+
         model.addAttribute("chatRoomId", roomId);
         model.addAttribute("messages", chatService.getChatMessages(roomId));
-        model.addAttribute("otherUser", otherUser.getUsername());
+        model.addAttribute("otherUser", otherUser); // 전체 otherUser 객체를 전달
         return "chatroom";
     }
 
-    // 메시지 전송
+
+    // 2
     @MessageMapping("/chat/{roomId}")
-    // @DestinationVariable Long roomId: 사용자가 보낸 메시지가 어떤 채팅방과 관련이 있는지를 식별
-    // ChatMessage message에는 채팅메시지 내용, 발신자ID, 수신자ID 등을 포함하고있어야됨
     public void sendMessage(@DestinationVariable Long roomId, ChatMessage message) {
         // 유효성 검사
-        if (message.getSender() == null || message.getRecipient() == null) {
+//        if (message.getSender() == null || message.getRecipient() == null) {
+//            throw new IllegalArgumentException("Sender or Recipient cannot be null");
+//        }
+        if (message.getSender() == null || message.getSender().getId() == null ||
+                message.getRecipient() == null || message.getRecipient().getId() == null) {
             throw new IllegalArgumentException("Sender ID or Recipient ID cannot be null");
         }
-        // ChatRoom 객체 가져오기 (예시: roomId로부터 ChatRoom 객체를 조회)
+
         ChatRoom chatRoom = chatService.findChatRoomById(roomId);
         if (chatRoom == null) {
             throw new IllegalArgumentException("Chat room not found");
         }
 
-        // 예시: 현재 로그인한 사용자 정보를 가져오는 방법
-        User user = userService.findById(message.getSender()); // 발신자 정보
-        User recipientUser = userService.findById(message.getRecipient()); // 수신자 정보
+        // 데이터베이스에서 실제 User 객체를 가져옴
+        User sender = userService.findById(message.getSender().getId());
+        User recipient = userService.findById(message.getRecipient().getId());
 
-        // ChatMessage 객체 생성 시 sender 및 recipient 설정
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSender(user); // user는 발신자 User 객체
-        chatMessage.setRecipient(recipientUser); // recipientUser는 수신자 User 객체
-        chatMessage.setChatRoom(chatRoom);
-        chatMessage.setContent(message.getContent());
+        ChatMessage chatMessage = new ChatMessage(chatRoom, sender, recipient, message.getContent());
+        chatMessage.setTimestamp(LocalDateTime.now());
 
         // 메시지 저장
         chatService.saveMessage(chatMessage);
-        // 메시지 처리 로직 (예: 데이터베이스에 저장)
-//        chatService.saveMessage(roomId, message.getSenderId(), message.getContent(), message.getRecipientId());
+
         // 상대방에게 메시지 전송
-        messagingTemplate.convertAndSendToUser(    // convertAndSendToUser: 특정 사용자에게 메시지를 전송하는 메서드
-                message.getRecipient().toString(),  // 메시지를 받을 사용자의 ID를 문자열로 변환하여 지정
-                "/queue/messages",    // 사용자가 수신할 메시지의 대기열
-                message    // 실제로 전송할 메시지 객체
+        messagingTemplate.convertAndSendToUser(
+                recipient.getId().toString(),
+                "/queue/messages",
+                chatMessage
         );
     }
 
@@ -154,8 +137,19 @@ public class ChatController {
 
     @GetMapping("/chat/messages/{chatRoomId}")
     @ResponseBody
-    public List<ChatMessage> getChatMessages(@PathVariable Long chatRoomId) {
-        return chatService.getChatMessages(chatRoomId);
+    public List<ChatMessageDTO> getChatMessages(@PathVariable Long chatRoomId) {
+        List<ChatMessage> messages = chatService.getChatMessages(chatRoomId);
+        return messages.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private ChatMessageDTO convertToDTO(ChatMessage message) {
+        return new ChatMessageDTO(
+                message.getId(),
+                message.getSender().getId(),
+                message.getRecipient().getId(),
+                message.getContent(),
+                message.getTimestamp()
+        );
     }
 
     // 수정코드

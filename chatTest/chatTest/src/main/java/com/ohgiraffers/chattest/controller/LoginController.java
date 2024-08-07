@@ -22,15 +22,7 @@ public class LoginController {
         return "/login";
     }
 
-//    @PostMapping("/login")
-//    public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-//        User user = userService.loginUser(username, password);
-//        if (user != null) {
-//            session.setAttribute("user", user);
-//            return "redirect:/chat/" + username;
-//        }
-//        return "redirect:/login?error";
-//    }
+
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {

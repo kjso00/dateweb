@@ -15,7 +15,6 @@ import java.util.List;
 
 
 @Service
-
 @Transactional
 public class ChatService {
     @Autowired
@@ -26,22 +25,6 @@ public class ChatService {
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
-
-    // 사용자와 상대방 채팅방 생성
-//    public ChatRoom createChatRoom(String username1, String username2) {
-//        User user1 = userRepository.findByUsername(username1);
-//        User user2 = userRepository.findByUsername(username2);
-//
-//        ChatRoom existingRoom = chatRoomRepository.findByUser1AndUser2(user1, user2);
-//        if (existingRoom != null) {
-//            return existingRoom;
-//        }
-//
-//        ChatRoom newRoom = new ChatRoom();
-//        newRoom.setUser1(user1);
-//        newRoom.setUser2(user2);
-//        return chatRoomRepository.save(newRoom);
-//    }
 
     // 수정코드
     public ChatRoom findChatRoomByUsers(Long userId1, Long userId2) {
@@ -62,24 +45,6 @@ public class ChatService {
         return chatRoomRepository.findById(roomId).orElse(null); // Optional을 사용하여 채팅방 조회
     }
 
-
-    // ------------------------------------
-//    public void saveMessage(Long roomId, Long senderId, String content, Long recipientId) {
-//        // ChatRoom 객체 가져오기
-//        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-//                .orElseThrow(() -> new IllegalArgumentException("Chat room not found")); // 채팅방이 존재하지 않을 경우 예외 처리
-//
-//        ChatMessage chatMessage = new ChatMessage();
-//        chatMessage.setRoomId(roomId);
-//        chatMessage.setSenderId(senderId);
-//        chatMessage.setContent(content);
-//        chatMessage.setRecipientId(recipientId);
-//        // 현재 시간을 LocalDateTime으로 설정
-//        LocalDateTime now = LocalDateTime.now();
-//        chatMessage.setTimestamp(now); // LocalDateTime 타입으로 설정
-//        // 메시지를 데이터베이스에 저장
-//        chatMessageRepository.save(chatMessage);
-//    }
 
     public void saveMessage(ChatMessage chatMessage) {
         // 현재 시간을 LocalDateTime으로 설정
