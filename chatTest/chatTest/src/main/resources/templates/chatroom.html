@@ -5,7 +5,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-<!--    <link th:href="@{/css/room.css}" rel="stylesheet" />-->
+    <!--    <link th:href="@{/css/room.css}" rel="stylesheet" />-->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,21 +83,21 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>Chat with <span th:text="${otherUser}"></span></h2>
-        </div>
-    <div id="chat-messages" class="chat-messages">
-    <div th:each="message : ${messages}">
-        <span th:text="${message.sender.username}"></span>: <span th:text="${message.content}"></span>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>Chat with <span th:text="${otherUser}"></span></h2>
     </div>
+    <div id="chat-messages" class="chat-messages">
+        <div th:each="message : ${messages}">
+            <span th:text="${message.sender.username}"></span>: <span th:text="${message.content}"></span>
+        </div>
     </div>
     <div class="chat-input">
         <input type="text" id="message-input" placeholder="Type a message...">
         <button onclick="sendMessage()">Send</button>
         <button onclick="leaveChatRoom()">Leave Chat Room</button>
     </div>
-    </div>
+</div>
 
 <script th:inline="javascript">
     let chatRoomId = [[${chatRoomId}]];
@@ -106,14 +106,15 @@
     let otherUserId = [[${otherUser.id}]];
     let otherUsername = [[${otherUser.username}]];
     let stompClient = null;
+    let isConnected = false;
 
-    // stompClient: 웹소켓 연결을 위한 STOMP 클라이언트 객체를 저장할 변수
     function connect() {
         let socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/user/queue/messages', function(message) {
+            isConnected = true;
+            stompClient.subscribe('/topic/chat/' + chatRoomId, function(message) {
                 showMessage(JSON.parse(message.body));
             });
             stompClient.subscribe('/user/queue/errors', function(error) {
@@ -121,39 +122,39 @@
                 alert('메시지 전송 중 오류 발생: ' + error.body);
             });
             loadExistingMessages();
+        }, function(error) {
+            console.error('STOMP error: ' + error);
+            isConnected = false;
+            // 연결 실패 시 재시도 로직을 여기에 추가할 수 있습니다.
         });
     }
 
-    // 오류 발생하면 get으로
     function loadExistingMessages() {
         $.get('/chat/messages/' + chatRoomId, function(messages) {
             messages.forEach(function(message) {
-                showMessage(messages);
+                showMessage(message);  // 'messages'가 아닌 'message'
             });
         });
     }
 
-    // 메시지 전송기능
     function sendMessage() {
-        let content = $('#message-input').val();
-        if(content && content.trim() !== '') {
+        if (!isConnected) {
+            console.error('웹소켓 연결이 설정되지 않았습니다.');
+            return;
+        }
+        let content = $('#message-input').val().trim();
+        if(content !== '') {
             const message = {
-                sender: {id: currentUserId},
-                recipient: {id: otherUserId},
+                senderId: currentUserId,
+                recipientId: otherUserId,
                 content: content
-                // recipientId: recipientId // 수신자 ID를 추가
             };
-            stompClient.send("/app/chat/" + chatRoomId, {},
-                JSON.stringify(message)
-                // JSON.stringify({sender: currentUser, content: content})
-            );
+            stompClient.send("/app/chat/" + chatRoomId, {}, JSON.stringify(message));
             $('#message-input').val('');
-            // 보낸 메시지 화면에 표시
-            showMessage({senderId: currentUserId, content: content});  // showMessage 호출
+            // 보낸 메시지는 서버로부터 다시 받아 표시하므로 여기서는 따로 표시하지 않습니다.
         }
     }
 
-    // 메시지 표시
     function showMessage(message) {
         let messageElement = $('<div class="message"></div>');
         let senderElement = $('<div class="message-sender"></div>').text(
@@ -173,15 +174,11 @@
         scrollToBottom();
     }
 
-
-    // 스크롤
     function scrollToBottom() {
         let chatMessages = document.getElementById('chat-messages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-
-    // 채팅방 나가기
     function leaveChatRoom() {
         $.post('/chat/leave', {chatRoomId: chatRoomId}, function(response) {
             if (response.success) {
@@ -190,7 +187,6 @@
         });
     }
 
-    // 엔터 누르면 전송
     $(function() {
         connect();
         $('#message-input').keypress(function(e) {
