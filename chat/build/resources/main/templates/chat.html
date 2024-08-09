@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<!--채팅요청 보내는 페이지-->
+
+<h1>Welcome, <span th:text="${username}"></span>!</h1>
+<!--사용자가 채팅 요청을 보낼 상대방의 이름을 입력할 수 있는 텍스트 박스-->
+<input type="text" id="recipient" placeholder="Recipient username">
+<!--버튼을 클릭하면 sendChatRequest() js 함수가 호출됨-->
+<button onclick="sendChatRequest()">Send Chat Request</button>
+
+<script th:inline="javascript">
+    // username변수를 js에서 사용할 수 있도록 서버에서 전달된 사용자 이름으로 초기화
+    var username = [[${username}]];
+
+    function sendChatRequest() {
+        // 입력필드에서 수신자의 사용자 이름을 가져옴
+        var recipient = $('#recipient').val();
+        //  $.post 메서드를 사용하여 /chat/request 경로에 POST 요청을 보냄
+        // 이 요청에는 현재 사용자이름 from: username과 수신자이름 to: recipient이 포함됨
+        // 서버에서 응답을 받으면 function(response) 이 부분이 실행됨
+        $.post('/chat/request', {from: username, to: recipient}, function(response) {
+            if (response.success) {
+                window.location.href = '/chat/room/' + response.chatRoomId;
+            }
+        });
+    }
+</script>
+</body>
+</html>
