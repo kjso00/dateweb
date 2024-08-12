@@ -29,6 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 이 설정으로 클라이언트가 /app으로 시작하는 경로로 메시지를 전송할 때, 해당 메시지가 @@MessageMapping이 있는 메소드에 매핑
         // 클라이언트가 /app/hello로 메시지를 보내면 서버의 @MessageMapping("/hello") 메서드가 처리
         config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
     // STOMP를 사용하여 클라이언트와 서버 간의 통신을 설정하는데 사용

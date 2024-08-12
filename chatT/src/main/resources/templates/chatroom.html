@@ -102,6 +102,7 @@
 <script th:inline="javascript">
     let chatRoomId = [[${chatRoomId}]];
     let currentUserId = [[${currentUser.id}]];
+    console.log("Current User ID:", currentUserId);
     let currentUsername = [[${currentUser.username}]];
     let otherUserId = [[${otherUser.id}]];
     let otherUsername = [[${otherUser.username}]];
@@ -109,12 +110,17 @@
 
     function connect() {
         let socket = new SockJS('/ws');
+
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             console.log('Connected: ' + frame);
 
+            // 채팅방 토픽 구독
             stompClient.subscribe('/topic/chat/' + chatRoomId, function(message) {
-                showMessage(JSON.parse(message.body));
+                let messageData = JSON.parse(message.body);
+                // 메시지의 발신자 ID와 현재 사용자 ID를 비교하여 isReceived를 결정합니다.
+                let isReceived = messageData.sender.id != currentUserId;
+                showMessage(messageData, isReceived);
             });
         });
     }
@@ -132,11 +138,16 @@
         }
     }
 
-    function showMessage(message) {
+    function showMessage(message, isReceived) {
         let chatMessages = document.getElementById('chat-messages');
         let messageElement = document.createElement('div');
-        let senderName = message.sender.id === currentUserId ? currentUsername : otherUsername;
-        messageElement.innerHTML = '<span>' + senderName + ':</span> ' + message.content;
+        messageElement.className = isReceived ? 'message received' : 'message sent';
+
+        // 메시지 객체의 구조에 따라 발신자 ID를 올바르게 가져옵니다.
+        let senderId = message.sender ? message.sender.id : message.senderId;
+        let senderName = senderId == currentUserId ? currentUsername : otherUsername;
+
+        messageElement.innerHTML = '<div class="message-content"><strong>' + senderName + ':</strong> ' + message.content + '</div>';
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }

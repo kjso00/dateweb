@@ -126,7 +126,8 @@ public class ChatController {
             return "redirect:/login";
         }
         List<User> users = userRepository.findAll();
-        users.remove(currentUser); // 현재 사용자를 목록에서 제외
+//        users.remove(currentUser); // 현재 사용자를 목록에서 제외
+        users.removeIf(user -> user.getId().equals(currentUser.getId())); // ID로 비교하여 제거
         model.addAttribute("users", users);
         return "userList";
     }

@@ -84,14 +84,28 @@ public class ChatService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
     @Transactional
-    public ChatRoom findOrCreateChatRoom(Long userId1, Long userId2) {
-        ChatRoom chatRoom = chatRoomRepository.findByUser1IdAndUser2IdOrUser1IdAndUser2Id(userId1, userId2, userId2, userId1);
+    public ChatRoom findOrCreateChatRoom(Long user1Id, Long user2Id) {
+        User user1 = userRepository.findById(user1Id).orElseThrow(() -> new RuntimeException("User not found: " + user1Id));
+        User user2 = userRepository.findById(user2Id).orElseThrow(() -> new RuntimeException("User not found: " + user2Id));
+
+        // 항상 ID가 작은 사용자를 user1으로 설정
+        if (user1.getId() > user2.getId()) {
+            User temp = user1;
+            user1 = user2;
+            user2 = temp;
+        }
+
+        // 양방향으로 채팅방 검색
+        ChatRoom chatRoom = chatRoomRepository.findByUser1AndUser2(user1, user2);
         if (chatRoom == null) {
-            User user1 = userRepository.findById(userId1).orElseThrow(() -> new RuntimeException("User not found"));
-            User user2 = userRepository.findById(userId2).orElseThrow(() -> new RuntimeException("User not found"));
+            chatRoom = chatRoomRepository.findByUser1AndUser2(user2, user1);
+        }
+
+        if (chatRoom == null) {
             chatRoom = new ChatRoom(user1, user2);
             chatRoomRepository.save(chatRoom);
         }
+
         return chatRoom;
     }
 
