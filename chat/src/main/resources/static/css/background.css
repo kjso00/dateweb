@@ -1,0 +1,72 @@
+/* 전체 페이지 기본 스타일 */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* 스크롤바 제거 */
+    font-family: 'Arial', sans-serif;
+}
+
+/* 배경 이미지 스타일 - 화면 전체를 커버 */
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 화면을 꽉 채우도록 설정 */
+    z-index: -3; /* 다른 요소들 뒤에 위치 */
+}
+
+/* 헤더 이미지와 네비게이션 바 스타일 */
+#header {
+    position: relative;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+}
+
+nav {
+    position: absolute;
+    right: 20px;
+    top: 130px; /* 헤더 아래로 약간 내려오도록 조정 */
+    display: flex;
+    justify-content: flex-end;
+    gap: 30px;
+    font-size: 18px;
+    z-index: 2;
+}
+
+nav a {
+    color: #333; /* 진한 색상으로 변경 */
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #000; /* 마우스를 올렸을 때 색상 변경 */
+}
+
+/* 중앙 콘텐츠 스타일 */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 36px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 텍스트 그림자 */
+}

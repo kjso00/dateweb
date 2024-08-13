@@ -23,10 +23,45 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    //  TEST 관련
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // 비동기 HTTP 클라이언트를 위한 의존성, 외부 API 연동
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    //JsonParser
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+    implementation 'org.json:json:20210307'
+
+    runtimeOnly 'org.webjars:bootstrap:4.5.0' // 관리자페이지에 사용할 부트스트랩
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(ProcessResources) {
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.properties'
+        filter(org.apache.tools.ant.filters.EscapeUnicode)
+    }
+
+    tasks.withType(ProcessResources) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 }

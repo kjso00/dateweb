@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" th:href="@{../static/css/login.css}">
+    <link rel="stylesheet" th:href="@{../static/css/background.css}">
 </head>
 <body>
-<h2>Login</h2>
-<form action="/login" method="post">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
-<a href="/register">Register</a>
+<img src="/image/BG.svg" alt="Background" id="bg">
+<img src="/image/header.svg" alt="Header" id="header">
+
+<div class="container">
+    <div class="btn-box">
+        <div>
+            <img th:src="@{../../../../../../loveMatchProject/src/main/resources/static/img/login-google.png}" onclick="location.href='/oauth2/authorization/google'" class="btn-login"/>
+        </div>
+        <div>
+            <img th:src="@{../static/img/login-naver.png}" onclick="location.href='/oauth2/authorization/naver'" class="btn-login"/>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
