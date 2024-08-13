@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>match</title>
+</head>
+<body>
+    <h1>나의 이상형 찾기</h1>
+        <h3>자신만의 필터링을 넣어주세요.</h3>
+        <form action="/lovematch/filtering" method="post">
+            <label>성별:</label>
+            <input type="radio" id="male" name="gender" value="남">
+            <label for="male">남</label>
+            <input type="radio" id="female" name="gender" value="여">
+            <label for="female">여</label><br>
+            <br>
+            <label>외모상:</label>
+            <input type="radio" id="cat" name="face" value="고양이">
+            <label for="cat">고양이</label>
+            <input type="radio" id="dog" name="face" value="강아지">
+            <label for="dog">강아지</label>
+            <input type="radio" id="rabbit" name="face" value="토끼">
+            <label for="rabbit">토끼</label>
+            <input type="radio" id="snake" name="face" value="뱀">
+            <label for="snake">뱀</label>
+            <input type="radio" id="fox" name="face" value="여우">
+            <label for="fox">여우</label><br>
+            <br>
+            <label>종교:</label>
+
+
+            <input type="submit" value="Filter">
+        </form>
+   </body>
+</html>

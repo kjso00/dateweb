@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>profileUpdateForm</title>
+    <!--개인회원 프로필 수정 진행하는 페이지-->
+</head>
+<body>
+<form action="/profile/save" method="post" name="updateForm">
+    <input type="hidden" name="id" th:value="${profileUpdate.id}">
+    Name: <input type="text" name="profileName" th:value="${profileUpdate.profileName}" readonly> <br>
+    password: <input type="password" name="profilePassword" id="profilePassword"> <br>
+    Gender: <input type="text" name="profileGender" th:value="${profileUpdate.profileGender}"> <br>
+    Age: <input type="text" name="profileAge" th:value="${profileUpdate.profileAge}"> <br>
+    Height: <input type="text" name="profileHeight" th:value="${profileUpdate.profileHeight}"> <br>
+    MBTI: <input type="text" name="profileMBTI" th:value="${profileUpdate.profileMBTI}"> <br>
+    Location: <input type="text" name="profileLocation" th:value="${profileUpdate.profileLocation}"> <br>
+    <input type="button" value="sendToDB" onclick="profileUpdate()">
+</form>
+<script th:inline="javascript">
+    const profileUpdate = () => {
+        const pass = [[${profileUpdate.profilePassword}]];
+        const inputPass = document.getElementById("profilePassword").value;
+        if(pass == inputPass){
+            document.updateForm.submit();
+        }else{
+            alert("비밀번호가 일치하지 않습니다.")
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>profileSaveForm</title>
+    <!--개인회원 프로필 등록 진행하는 페이지-->
+</head>
+<body>
+<form action="/profile/save" method="post" enctype="multipart/form-data">
+    Name: <input type="text" name="profileName"> <br>
+    password: <input type="password" name="profilePassword"> <br>
+    Gender: <input type="text" name="profileGender"> <br>
+    Age: <input type="text" name="profileAge"> <br>
+    Height: <input type="text" name="profileHeight"> <br>
+    MBTI: <input type="text" name="profileMBTI"> <br>
+    Location: <input type="text" name="profileLocation"> <br>
+    file: <input type="file" name="profileFile"> <br>
+    <input type="submit" value="sendToDB">
+</form>
+</body>
+</html>
+<!--        contents: <textarea name="boardContents" cols="30" rows="10"></textarea> <br>-->
+

@@ -1,0 +1,17 @@
+server:
+  port: 8800
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          auto: update
+
+    database: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/gangnam
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver

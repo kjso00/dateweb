@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Saved Profile</title>
+</head>
+<body>
+    <h1>나의 프로필 정보</h1>
+    <input type="hidden" id="profileId" th:value="${profile.id}">
+    <div th:if="${profile.storedFileName != null and !profile.storedFileName.isEmpty()}">
+        <h2>프로필 사진</h2>
+        <img th:src="@{'/profile-images/' + ${profile.storedFileName}}" alt="프로필 사진" style="width: 100%; max-width: 300px; height:150px;">
+    </div>
+    <div th:unless="${profile.storedFileName != null and !profile.storedFileName.isEmpty()}">
+        <p>프로필 사진이 없습니다.</p>
+    </div>
+    <p>이름: <span th:text="${profile.profileName}"></span></p>
+    <p>성별: <span th:text="${profile.profileGender}"></span></p>
+    <p>나이: <span th:text="${profile.profileAge}"></span></p>
+    <p>키: <span th:text="${profile.profileHeight}"></span></p>
+    <p>MBTI: <span th:text="${profile.profileMBTI}"></span></p>
+    <p>위치: <span th:text="${profile.profileLocation}"></span></p>
+<br>
+    <!-- 버튼들 -->
+    <button onclick="showAllProfile()" > 전체 회원들 보기 </button>
+    <button onclick="updateMyProfile()" > 내 프로필 수정하기 </button>
+    <button onclick="deleteMyProfile()" > 내 프로필 비활성화 </button>
+</body>
+<script th:inline="javascript">
+
+    // 전체 회원들 보기
+    const showAllProfile = () => {
+        location.href = "/profile/list"
+    }
+
+    // 프로필 수정 페이지로 이동
+    const updateMyProfile = () => {
+        console.log("수정요청");
+        const id = [[${profile.id}]];
+        location.href="/profile/update/"+id;
+    }
+
+    // 프로필 삭제 페이지 이동
+    const deleteMyProfile = () => {
+        console.log("삭제오쳥");
+        const id = [[${profile.id}]];
+        location.href="/profile/delete/"+id;
+    }
+
+</script>
+</html>
+
+
+
+
